@@ -1,0 +1,24 @@
+node_modules/
+.next/
+out/
+build/
+.DS_Store
+*.pem
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# 本地环境变量（含后台密码等敏感信息）
+.env
+.env.local
+.env*.local
+
+# 后台表单提交产生的本地数据
+/data/applications.jsonl
+
+# 调研时下载的临时素材
+/.research
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts

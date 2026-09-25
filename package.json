@@ -1,0 +1,34 @@
+{
+  "name": "capu-racing-site",
+  "version": "0.1.0",
+  "private": true,
+  "description": "成航CAPU大学生方程式车队宣传与招新平台",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "framer-motion": "^13.4.3",
+    "gray-matter": "^4.0.3",
+    "next": "^15.5.26",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remark": "^15.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-html": "^16.0.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26.6.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^15.5.26",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3"
+  }
+}
