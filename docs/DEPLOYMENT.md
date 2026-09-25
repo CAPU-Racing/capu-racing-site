@@ -24,7 +24,7 @@
 | 项目 | 要求 |
 | --- | --- |
 | Node.js | 20 LTS 或更高。本项目在 **Node 24.11.1** 上验证通过 |
-| npm | 随 Node 附带即可 |
+| npm | 随 Node 附带即可（**10.8.2 与 11.6.2 均验证通过**）。但改依赖后生成 `package-lock.json` 有坑，见 §9 |
 | 构建期内存 | 建议预留 **1.5–2 GB** 可用内存，见下方说明 |
 | 运行期内存 | 常驻约 **150–300 MB** |
 | 磁盘 | 很小（产物 + `node_modules` 约 500 MB） |
@@ -431,6 +431,7 @@ pm2 restart capu-racing
 
 | 现象 | 原因 | 处理 |
 | --- | --- | --- |
+| `npm ci` 报 `EUSAGE`，提示 `Missing: @emnapi/runtime@… from lock file` | 锁文件缺少 wasm32 可选包（`@tailwindcss/oxide-wasm32-wasi`、`@img/sharp-wasm32`）**自带依赖**的条目。npm 11 生成锁文件时会漏掉这些条目，npm 10 校验时判定「不同步」 | 在项目目录跑一次 `npm install` 补齐锁文件（只新增 `@emnapi/*` 等 8 个条目，不改任何已有版本），之后 `npm ci` 即可通过 |
 | 构建报 `Zone Allocation failed - process out of memory` | 构建期 worker 太多，Commit 内存被占满 | `NEXT_BUILD_CPUS=1 npm run build`；或先释放内存再构建 |
 | 页面报 `ChunkLoadError`，且 `/_next/static/chunks/*.js` 全部返回 **400** | 有**孤儿 `next dev` 进程**在监视项目目录，把 `.next` 覆盖成了开发产物 | 见下方命令，杀掉所有 dev 进程 → 删 `.next` → 重新构建 |
 | `/admin` 提示「配置引导」而非密码框 | `ADMIN_PASSWORD` < 4 位，或 `ADMIN_SESSION_SECRET` < 16 位 | 检查变量长度 |
