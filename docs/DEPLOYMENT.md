@@ -79,7 +79,7 @@ cp .env.example .env.local      # Windows: copy .env.example .env.local
 | `ADMIN_SESSION_SECRET` | 是 | 会话 cookie 签名密钥 | 运行期 |
 | `NEXT_PUBLIC_SITE_URL` | 是 | 站点对外地址，用于 sitemap / canonical / OG | **构建期** ⚠️ |
 
-### 两个容易踩的坑
+### 三个容易踩的坑
 
 **① 长度不足会静默禁用后台。** 代码里有最小长度校验（`src/lib/auth.ts`）：
 
@@ -96,8 +96,30 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 **② `NEXT_PUBLIC_SITE_URL` 改了必须重新构建。** 实测验证：同一个构建产物，用不同的 `NEXT_PUBLIC_SITE_URL` 启动两次，`sitemap.xml` 输出的域名完全相同（都是构建时的那份）。运行期修改这个变量**不会生效**。
 
-> 注意：仓库里的 `.env.local` 目前是开发用的 `http://localhost:3100`（早期调试遗留）。
-> 上线前务必改成真实域名，并且**改完要重新 `npm run build`**。
+> 注意：本地 `.env.local` 里是开发用的 `http://localhost:…`。上线前务必改成真实域名，
+> 并且**改完要重新 `npm run build`**。
+
+**③ 端口不是靠 `NEXT_PUBLIC_SITE_URL` 改的。** 这个变量只影响生成的元数据，**不决定服务监听哪个端口**。把它的端口从 3100 改成 3123，服务依然会监听 3000。
+
+端口只有两种改法：
+
+```bash
+npm run start -- -p 3123                 # 命令行参数（推荐）
+npx next start -p 3123 -H 127.0.0.1      # 不带 npm 时
+
+PORT=3123 npm run start                  # 进程级环境变量；systemd 用 Environment=PORT=3123
+```
+
+默认 **3000**。两种方式在 systemd / PM2 / Docker 里都对应得上：
+
+- systemd：`Environment=PORT=3123`
+- PM2：写进 `ecosystem.config.js` 的 `env: { PORT: 3123 }`
+- Docker：`ENV PORT=3123`（镜像里已有 `PORT=3000`，改成你要的即可）
+
+⚠️ **`.env.local` 里写 `PORT=3123` 是无效的**：Next 的命令行在**解析参数阶段**就读走了 `process.env.PORT`（并拿 3000 当默认值），而 `.env` 文件是在那之后才由服务进程加载的。
+
+> 改完端口后，把 `NEXT_PUBLIC_SITE_URL` 的端口也改成一致，并**重新 `npm run build`**；
+> 否则 sitemap / OG 卡片里的链接会指向打不开的地址。
 
 ---
 
